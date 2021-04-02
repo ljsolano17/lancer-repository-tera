@@ -10,58 +10,63 @@ const fs = require('fs'),
         let lastTimeout = null;
         let config_file = require('./config.json');
 
-        if (config_file['WALLOP_CANCEL_DELAY'] && typeof config_file['WALLOP_CANCEL_DELAY'] === "number") {
-            skill_ids['25'] = {
-                'delay': config_file['WALLOP_CANCEL_DELAY'],
-                'fixedDelay': true
-            };
-        }
+        if (config_file['ONSLAUGHT_CANCEL_DELAY'] &&
+        typeof config_file['ONSLAUGHT_CANCEL_DELAY'] === "number") {
+           skill_ids['3'] = {
+               'delay': config_file['ONSLAUGHT_CANCEL_DELAY']
+           };
+       }
+       if (config_file['SHIELD_COUNTER_CANCEL_DELAY'] &&
+       typeof config_file['SHIELD_COUNTER_CANCEL_DELAY'] === "number") {
+          skill_ids['8'] = {
+              'delay': config_file['SHIELD_COUNTER_CANCEL_DELAY']
+          };
+      }
+      if (config_file['DEBILITIATE_CANCEL_DELAY'] &&
+      typeof config_file['DEBILITIATE_CANCEL_DELAY'] === "number") {
+         skill_ids['10'] = {
+             'delay': config_file['DEBILITIATE_CANCEL_DELAY']
+         };
+     }
+      if (config_file['SPRING_ATTACK_CANCEL_DELAY'] &&
+      typeof config_file['SPRING_ATTACK_CANCEL_DELAY'] === "number") {
+         skill_ids['13'] = {
+             'delay': config_file['SPRING_ATTACK_CANCEL_DELAY']
+         };
+      }
+      if (config_file['LOCKDOWN_CANCEL_DELAY'] &&
+      typeof config_file['LOCKDOWN_CANCEL_DELAY'] === "number") {
+         skill_ids['21'] = {
+             'delay': config_file['LOCKDOWN_CANCEL_DELAY']
+         };
+     }
         if (config_file['SUPER_LEAP_CANCEL_DELAY'] &&
          typeof config_file['SUPER_LEAP_CANCEL_DELAY'] === "number") {
             skill_ids['28'] = {
                 'delay': config_file['SUPER_LEAP_CANCEL_DELAY']
             };
         }
-        if (config_file['LOCKDOWN_CANCEL_DELAY'] &&
-        typeof config_file['LOCKDOWN_CANCEL_DELAY'] === "number") {
-           skill_ids['21'] = {
-               'delay': config_file['LOCKDOWN_CANCEL_DELAY']
-           };
-       }
-       if (config_file['DEBILITIATE_CANCEL_DELAY'] &&
-       typeof config_file['DEBILITIATE_CANCEL_DELAY'] === "number") {
-          skill_ids['10'] = {
-              'delay': config_file['DEBILITIATE_CANCEL_DELAY']
-          };
-      }
-      if (config_file['SHIELD_COUNTER_CANCEL_DELAY'] &&
-      typeof config_file['SHIELD_COUNTER_CANCEL_DELAY'] === "number") {
-         skill_ids['8'] = {
-             'delay': config_file['SHIELD_COUNTER_CANCEL_DELAY']
-         };
-     }
-     if (config_file['SPRING_ATTACK_CANCEL_DELAY'] &&
-     typeof config_file['SPRING_ATTACK_CANCEL_DELAY'] === "number") {
-        skill_ids['13'] = {
-            'delay': config_file['SPRING_ATTACK_CANCEL_DELAY']
-        };
-    }
+      
+     
+     
+    
     if (config_file['SHIELD_B_CANCEL_DELAY'] &&
     typeof config_file['SHIELD_B_CANCEL_DELAY'] === "number") {
        skill_ids['18'] = {
            'delay': config_file['SHIELD_B_CANCEL_DELAY']
        };
    }
-   if (config_file['ONSLAUGHT_CANCEL_DELAY'] &&
-   typeof config_file['ONSLAUGHT_CANCEL_DELAY'] === "number") {
-      skill_ids['3'] = {
-          'delay': config_file['ONSLAUGHT_CANCEL_DELAY']
-      };
-  }
+ 
+  if (config_file['WALLOP_CANCEL_DELAY'] && typeof config_file['WALLOP_CANCEL_DELAY'] === "number") {
+    skill_ids['25'] = {
+        'delay': config_file['WALLOP_CANCEL_DELAY'],
+        'fixedDelay': true
+    };
+}
         command.add('lancer', {
             '$default'() {
                 isEnabled = !isEnabled;
-                command.message('Lancer is now ' + (isEnabled ? 'enabled' : 'disabled') + ', hola jose yiko');
+                command.message('Lancer is now ' + (isEnabled ? 'enabled' : 'disabled') );
             }
         });
 
@@ -69,11 +74,11 @@ const fs = require('fs'),
 
         mod.hook('S_ACTION_STAGE', 9, { order: -1000000, filter: {fake: true} }, event => {
             
-           // if (!isEnabled || event.gameId !== mod.game.me.gameId || mod.game.me.class !== 'lance') return;
+         if (!isEnabled) return;
             
             const skill_id = Math.floor(event.skill.id / 10000);
             const altSkill_id = event.skill.id % 100;
-            command.message('skill id'+parseInt(skill_id));
+          //  command.message('skill id'+parseInt(skill_id));
             if (skill_id in skill_ids || skill_id + '-' + altSkill_id in skill_ids) {
                 
                 const skillInfo = skill_id in skill_ids ? skill_ids[skill_id] : skill_ids[skill_id + '-' + altSkill_id];
@@ -99,7 +104,7 @@ const fs = require('fs'),
         mod.hook('S_ACTION_END', 5, {'order': -1000000,'filter': {'fake': true }}, event => {
            
           //  if (!isEnabled || event.gameId !== mod.game.me.gameId || mod.game.me.class !== 'lance') return;
-    
+          if (!isEnabled) return;
             const skill_id = Math.floor(event.skill.id / 10000);
             const altSkill_id = event.skill.id % 100;
     
@@ -116,7 +121,7 @@ const fs = require('fs'),
     
         mod.hook('C_CANCEL_SKILL', 3, event => {
            // if (!isEnabled || mod.game.me.class !== 'lance') return;
-    
+           if (!isEnabled) return;
             if (lastTimeout) {
                 mod.clearTimeout(lastTimeout);
                 lastTimeout = null;
